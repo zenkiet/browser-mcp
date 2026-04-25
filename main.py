@@ -1,7 +1,6 @@
 import os
+from browser_use import ChatOpenAI
 from mcp.server.fastmcp import FastMCP
-from langchain_openai import ChatOpenAI
-from pydantic import SecretStr
 from dotenv import load_dotenv
 
 # Initialize MCP Server
@@ -9,7 +8,7 @@ mcp = FastMCP("browser-use-node", host="0.0.0.0")
 
 # Configure AI
 load_dotenv()
-CUSTOM_BASE_URL = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENAI_API_BASE")
+CUSTOM_BASE_URL = os.getenv("OPENAI_BASE_URL")
 CUSTOM_API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
 
@@ -17,12 +16,15 @@ if not CUSTOM_API_KEY:
     raise RuntimeError("Missing OPENAI_API_KEY in environment.")
 
 if not CUSTOM_BASE_URL:
-    raise RuntimeError("Missing OPENAI_BASE_URL or OPENAI_API_BASE in environment.")
+    raise RuntimeError("Missing OPENAI_BASE_URL in environment.")
+
+if not MODEL_NAME:
+    raise RuntimeError("Missing MODEL_NAME in environment.")
 
 llm = ChatOpenAI(
     model=MODEL_NAME,
-    api_key=SecretStr(CUSTOM_API_KEY),
-    base_url=CUSTOM_BASE_URL
+    api_key=CUSTOM_API_KEY,
+    base_url=CUSTOM_BASE_URL,
 )
 
 browser = None
@@ -31,18 +33,16 @@ browser = None
 def get_browser():
     global browser
     if browser is None:
-        from browser_use.browser.browser import Browser, BrowserConfig
+        from browser_use import BrowserSession
 
-        browser = Browser(
-            config=BrowserConfig(
-                headless=True,
-                extra_chromium_args=[
-                    "--no-sandbox",
-                    "--disable-dev-shm-usage",
-                    "--disable-blink-features=AutomationControlled",
-                    "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                ],
-            )
+        browser = BrowserSession(
+            headless=True,
+            args=[
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-blink-features=AutomationControlled",
+            ],
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         )
     return browser
 

@@ -1,8 +1,4 @@
-browser-use
+browser-use==0.12.6
 playwright
-playwright-stealth
 mcp[server]
-uvicorn
-fastapi
-langchain-openai
 python-dotenv
