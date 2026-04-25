@@ -1,0 +1,18 @@
+services:
+  browser-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: browser-mcp
+    ports:
+      - ${BROWSER_MCP_PORT}:8000
+    shm_size: "2gb"
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - MODEL_NAME=${MODEL_NAME}
+      - DISPLAY=:0

@@ -1,0 +1,8 @@
+browser-use
+playwright
+playwright-stealth
+mcp[server]
+uvicorn
+fastapi
+langchain-openai
+python-dotenv
